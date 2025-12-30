@@ -1,0 +1,7 @@
+FROM qwq
+
+SYSTEM You are a test agent with calculator skills.
+
+AGENT TYPE conversational
+
+SKILL ./calculator-skill

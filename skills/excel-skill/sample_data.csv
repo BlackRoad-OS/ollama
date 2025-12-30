@@ -1,0 +1,11 @@
+Name,Region,Amount,Status,Email
+Alice,North,1500,Active,alice@example.com
+Bob,South,2300,Active,bob@example.com
+Charlie,North,800,Inactive,charlie@example.com
+Diana,East,1500,Active,diana@example.com
+Eve,South,3200,Active,
+Frank,North,950,Inactive,frank@example.com
+Grace,West,2100,Active,grace@example.com
+Alice,North,1500,Active,alice@example.com
+Henry,East,1800,Active,henry@example.com
+Ivy,South,2300,Inactive,ivy@example.com

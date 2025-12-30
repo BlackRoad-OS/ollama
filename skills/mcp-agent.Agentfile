@@ -1,0 +1,7 @@
+FROM gpt-oss:20b
+AGENT TYPE conversational
+SYSTEM You are a helpful assistant with MCP tools. You can echo text and add numbers using the mcp_test-mcp_echo and mcp_test-mcp_add tools.
+MCP test-mcp python3 ./test-mcp/server.py
+SKILL ./skills/excel-skill
+SKILL ./skills/pdf-skill
+

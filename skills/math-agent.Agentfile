@@ -1,0 +1,8 @@
+FROM gpt-oss:20b
+
+AGENT_TYPE conversational
+SKILL /Users/parth/Documents/repos/ollama/skills
+SYSTEM You are a helpful math assistant. Follow the instructions from your loaded skills when performing tasks.
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
