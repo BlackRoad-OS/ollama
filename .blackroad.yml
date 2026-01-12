@@ -1,0 +1,5 @@
+version: 2.0.0
+upstream: ollama/ollama
+upstream_sync:
+  enabled: true
+  schedule: "0 */6 * * *"

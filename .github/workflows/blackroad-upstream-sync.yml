@@ -1,0 +1,61 @@
+name: BlackRoad Upstream Sync
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config user.name "BlackRoad Sync Bot"
+          git config user.email "sync@blackroad.io"
+      
+      - name: Get upstream
+        id: upstream
+        run: |
+          UPSTREAM=$(gh api repos/${{ github.repository }} --jq '.parent.full_name // empty')
+          echo "repo=$UPSTREAM" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Sync
+        if: steps.upstream.outputs.repo != ''
+        run: |
+          git remote add upstream https://github.com/${{ steps.upstream.outputs.repo }}.git || true
+          git fetch upstream
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+          
+          CHANGES=$(git rev-list --count HEAD..upstream/$DEFAULT_BRANCH 2>/dev/null || echo "0")
+          
+          if [ "$CHANGES" = "0" ]; then
+            echo "✅ Up to date"
+            exit 0
+          fi
+          
+          if git merge upstream/$DEFAULT_BRANCH -m "🔄 Auto-sync from upstream"; then
+            git push origin $DEFAULT_BRANCH
+            echo "✅ Synced $CHANGES commits"
+          else
+            echo "⚠️ Conflict - creating PR"
+            git merge --abort
+            BRANCH="upstream-sync-$(date +%Y%m%d)"
+            git checkout -b $BRANCH
+            git reset --hard upstream/$DEFAULT_BRANCH
+            git push -u origin $BRANCH
+            gh pr create --title "🔄 Upstream sync needs merge" --body "Manual merge required" --head $BRANCH --base $DEFAULT_BRANCH
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
